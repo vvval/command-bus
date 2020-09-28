@@ -17,7 +17,7 @@ class InMemoryTransportTest extends TestCase
             'foo' => 'bar',
         ]);
 
-        $transport->send('queue', $envelope);
+        $transport->send($envelope);
 
         self::assertEquals([], $transport->receive('unknown'));
         self::assertEquals([$envelope], $transport->receive('queue'));

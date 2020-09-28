@@ -24,9 +24,9 @@ final class InMemoryTransport implements Transport, Consumer
     /**
      * {@inheritDoc}
      */
-    public function send(string $route, Envelope $envelope): void
+    public function send(Envelope $envelope): void
     {
-        $this->envelopes[$route][] = $envelope;
+        $this->envelopes[$envelope->type][] = $envelope;
     }
 
     /**
@@ -44,7 +44,7 @@ final class InMemoryTransport implements Transport, Consumer
     {
         $this->running = true;
 
-        foreach ($this->envelopes as $route => $items) {
+        foreach ($this->envelopes as $type => $items) {
             foreach ($items as $i => $item) {
                 if (!$this->running()) {
                     break 2;
@@ -53,7 +53,7 @@ final class InMemoryTransport implements Transport, Consumer
                 try {
                     $dispatcher->dispatch($item);
                 } finally {
-                    unset($this->envelopes[$route][$i]);
+                    unset($this->envelopes[$type][$i]);
                 }
             }
         }

@@ -31,6 +31,11 @@ final class BunnyTransport implements Transport
     private $logger;
 
     /**
+     * @var array<string, string>
+     */
+    private $exchanges = [];
+
+    /**
      * @var ?Channel
      */
     private $channel;
@@ -77,15 +82,29 @@ final class BunnyTransport implements Transport
     }
 
     /**
+     * @param string $message
+     * @param string $exchange
+     *
+     * @return void
+     */
+    public function exchanges(string $message, string $exchange): void
+    {
+        $this->exchanges[$message] = $exchange;
+    }
+
+    /**
      * {@inheritDoc}
      */
-    public function send(string $route, Envelope $envelope): void
+    public function send(Envelope $envelope): void
     {
+        $exchange = $this->exchanges[$envelope->type] ?? $this->options->exchange();
+        $routingKey = strtolower(str_replace('\\', '.', $envelope->type));
+
         $this->channel()->publish(
             $envelope->payload,
-            $envelope->headers,
-            $envelope->target,
-            $route,
+            $envelope->options,
+            $exchange,
+            $routingKey,
             $this->options->is(ExchangeOptions::FLAG_MANDATORY),
             $this->options->is(ExchangeOptions::FLAG_IMMEDIATE)
         );
@@ -97,14 +116,6 @@ final class BunnyTransport implements Transport
     public function consume(): Consumer
     {
         return new BunnyConsumer($this->client, $this->options, $this->logger);
-    }
-
-    /**
-     * @return string
-     */
-    public function exchange(): string
-    {
-        return $this->options->exchange();
     }
 
     /**

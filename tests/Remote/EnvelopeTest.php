@@ -11,16 +11,16 @@ class EnvelopeTest extends TestCase
 {
     public function testSerializeUnserialize(): void
     {
-        $target  = 'target';
+        $type  = 'type';
         $payload = 'payload';
         $headers = [
             'foo' => 'bar'
         ];
 
-        $envelope = new Envelope($target, $payload, $headers);
+        $envelope = new Envelope($type, $payload, $headers);
 
-        self::assertSame($target, $envelope->target);
+        self::assertSame($type, $envelope->type);
         self::assertSame($payload, $envelope->payload);
-        self::assertSame($headers, $envelope->headers);
+        self::assertSame($headers, $envelope->options);
     }
 }

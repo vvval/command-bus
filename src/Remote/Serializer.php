@@ -9,14 +9,14 @@ interface Serializer
     /**
      * @param object $command
      *
-     * @return string
+     * @return Envelope
      */
     public function serialize(object $command): string;
 
     /**
-     * @param string $data
+     * @param string $payload
      *
      * @return object
      */
-    public function unserialize(string $data): object;
+    public function deserialize(string $payload): object;
 }

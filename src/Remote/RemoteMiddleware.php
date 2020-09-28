@@ -9,26 +9,17 @@ use Onliner\CommandBus\Middleware;
 
 final class RemoteMiddleware implements Middleware
 {
-    public const OPTION_REMOTE = 'remote';
-
     /**
      * @var Gateway
      */
     private $gateway;
 
     /**
-     * @var array<string, string>
+     * @param Gateway $gateway
      */
-    private $routes;
-
-    /**
-     * @param Gateway               $gateway
-     * @param array<string, string> $routes
-     */
-    public function __construct(Gateway $gateway, array $routes)
+    public function __construct(Gateway $gateway)
     {
         $this->gateway = $gateway;
-        $this->routes  = $routes;
     }
 
     /**
@@ -36,27 +27,10 @@ final class RemoteMiddleware implements Middleware
      */
     public function call(object $message, Context $context, callable $next): void
     {
-        $class = get_class($message);
-
-        if ($this->shouldSend($class, $context)) {
-            $options = array_merge($context->all(), [
-                self::OPTION_REMOTE => true,
-            ]);
-
-            $this->gateway->send($this->routes[$class], $message, $options);
+        if ($context->get(Gateway::LOCAL, false)) {
+            $next($message, $context);
         } else {
-            $next($message, $context->del(self::OPTION_REMOTE));
+            $this->gateway->send($message, $context->all());
         }
-    }
-
-    /**
-     * @param string  $class
-     * @param Context $context
-     *
-     * @return bool
-     */
-    private function shouldSend(string $class, Context $context): bool
-    {
-        return isset($this->routes[$class]) && !$context->get(self::OPTION_REMOTE, false);
     }
 }

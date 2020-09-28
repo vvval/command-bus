@@ -9,7 +9,7 @@ final class Envelope
     /**
      * @var string
      */
-    public $target;
+    public $type;
 
     /**
      * @var string
@@ -19,17 +19,17 @@ final class Envelope
     /**
      * @var array<mixed>
      */
-    public $headers;
+    public $options;
 
     /**
-     * @param string       $target
+     * @param string       $type
      * @param string       $payload
-     * @param array<mixed> $headers
+     * @param array<mixed> $options
      */
-    public function __construct(string $target, string $payload, array $headers)
+    public function __construct(string $type, string $payload, array $options)
     {
-        $this->target  = $target;
+        $this->type    = $type;
         $this->payload = $payload;
-        $this->headers = $headers;
+        $this->options = $options;
     }
 }

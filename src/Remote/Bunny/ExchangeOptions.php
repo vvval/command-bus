@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Onliner\CommandBus\Remote\Bunny;
 
+use Bunny\Channel;
+
 class ExchangeOptions
 {
     public const

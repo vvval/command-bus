@@ -45,7 +45,7 @@ class BunnyTransportTest extends TestCase
         $channel
             ->expects(self::exactly(2))
             ->method('publish')
-            ->with($envelope->payload, $envelope->headers, $envelope->target, $queue)
+            ->with($envelope->payload, $envelope->options, $envelope->target, $queue)
         ;
 
         $client = self::createMock(Client::class);
@@ -67,7 +67,7 @@ class BunnyTransportTest extends TestCase
         ;
 
         $transport = new BunnyTransport($client);
-        $transport->send($queue, $envelope);
-        $transport->send($queue, $envelope);
+        $transport->send($envelope);
+        $transport->send($envelope);
     }
 }

@@ -21,11 +21,6 @@ final class RemoteExtension implements Extension
     private $serializer;
 
     /**
-     * @var array<string, string>
-     */
-    private $routes = [];
-
-    /**
      * @param Transport  $transport
      * @param Serializer $serializer
      */
@@ -36,24 +31,13 @@ final class RemoteExtension implements Extension
     }
 
     /**
-     * @param string $message
-     * @param string $exchange
-     *
-     * @return void
-     */
-    public function route(string $message, string $exchange): void
-    {
-        $this->routes[$message] = $exchange;
-    }
-
-    /**
      * {@inheritDoc}
      */
     public function setup(Builder $builder, array $options): void
     {
         $gateway = new Gateway($this->transport, $this->serializer);
 
-        $builder->middleware(new RemoteMiddleware($gateway, $this->routes));
+        $builder->middleware(new RemoteMiddleware($gateway));
 
         $builder->handle(Envelope::class, function (Envelope $envelope, Context $context) use ($gateway) {
             $gateway->receive($envelope, $context);

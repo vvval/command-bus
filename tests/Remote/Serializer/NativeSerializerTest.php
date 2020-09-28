@@ -15,6 +15,6 @@ class NativeSerializerTest extends TestCase
         $serializer = new NativeSerializer();
         $command = new Command\Hello('test');
 
-        self::assertEquals($command, $serializer->unserialize($serializer->serialize($command)));
+        self::assertEquals($command, $serializer->deserialize($serializer->serialize($command)));
     }
 }

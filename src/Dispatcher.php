@@ -28,6 +28,8 @@ final class Dispatcher
     public function dispatch(object $message, array $options = []): void
     {
         $handler = $this->resolver->resolve($message);
-        $handler($message, new Context($this, $options));
+        $context = new Context($this, $options);
+
+        $handler($message, $context);
     }
 }

@@ -19,8 +19,8 @@ final class NativeSerializer implements Serializer
     /**
      * {@inheritDoc}
      */
-    public function unserialize(string $data): object
+    public function deserialize(string $payload): object
     {
-        return unserialize($data);
+        return unserialize($payload);
     }
 }

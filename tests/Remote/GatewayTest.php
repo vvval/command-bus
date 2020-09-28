@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Onliner\CommandBus\Tests\Remote;
 
+use Onliner\CommandBus\Context;
 use Onliner\CommandBus\Remote\Envelope;
 use Onliner\CommandBus\Remote\Gateway;
 use Onliner\CommandBus\Remote\Serializer;
@@ -18,16 +19,15 @@ class GatewayTest extends TestCase
         $transport  = new InMemory\InMemoryTransport();
         $serializer = new Serializer\NativeSerializer();
 
-        $target  = 'target';
         $command = new Hello('onliner');
-        $headers = [
+        $options = [
             'foo' => 'bar',
         ];
 
         $gateway = new Gateway($transport, $serializer);
-        $gateway->send($target, $command, $headers);
+        $gateway->send($command, $options);
 
-        $queue = $transport->receive('onliner.commandbus.tests.command.hello');
+        $queue = $transport->receive(Hello::class);
 
         self::assertCount(1, $queue);
 
@@ -35,8 +35,8 @@ class GatewayTest extends TestCase
         $envelope = reset($queue);
 
         self::assertInstanceOf(Envelope::class, $envelope);
-        self::assertSame($target, $envelope->target);
+        self::assertSame(get_class($command), $envelope->type);
         self::assertSame($serializer->serialize($command), $envelope->payload);
-        self::assertSame($headers, $envelope->headers);
+        self::assertSame($options, $envelope->options);
     }
 }

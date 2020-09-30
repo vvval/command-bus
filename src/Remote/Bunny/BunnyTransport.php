@@ -87,7 +87,7 @@ final class BunnyTransport implements Transport
      *
      * @return void
      */
-    public function exchanges(string $message, string $exchange): void
+    public function map(string $message, string $exchange): void
     {
         $this->exchanges[$message] = $exchange;
     }

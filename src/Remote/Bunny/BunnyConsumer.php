@@ -11,12 +11,15 @@ use Bunny\Message;
 use Onliner\CommandBus\Dispatcher;
 use Onliner\CommandBus\Remote\Consumer;
 use Onliner\CommandBus\Remote\Envelope;
+use Onliner\CommandBus\Remote\Gateway;
 use Psr\Log\LoggerInterface;
 use Throwable;
 
 final class BunnyConsumer implements Consumer
 {
     private const
+        OPTION_EXCHANGE     = 'exchange',
+        OPTION_ROUTING_KEY  = 'routing_key',
         OPTION_CONSUMER_TAG = 'consumer_tag',
         OPTION_DELIVERY_TAG = 'delivery_tag',
         OPTION_REDELIVERED  = 'redelivered'
@@ -108,12 +111,16 @@ final class BunnyConsumer implements Consumer
     {
         try {
             $options = array_merge($message->headers, [
+                self::OPTION_EXCHANGE     => $message->exchange,
+                self::OPTION_ROUTING_KEY  => $message->routingKey,
                 self::OPTION_REDELIVERED  => $message->redelivered,
                 self::OPTION_CONSUMER_TAG => $message->consumerTag,
                 self::OPTION_DELIVERY_TAG => $message->deliveryTag,
             ]);
 
-            $dispatcher->dispatch(new Envelope($message->exchange, $message->content, $options));
+            $dispatcher->dispatch(new Envelope($message->routingKey, $message->content, $options), [
+                Gateway::LOCAL => true,
+            ]);
         } finally {
             $channel->ack($message);
         }

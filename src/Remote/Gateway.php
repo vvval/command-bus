@@ -38,9 +38,9 @@ final class Gateway
      */
     public function send(object $message, array $options): void
     {
-        $payload = $this->serializer->serialize($message);
+        $payload = $this->serializer->serialize(new Envelope(get_class($message), $message, $options));
 
-        $this->transport->send(new Envelope(get_class($message), $payload, $options));
+        $this->transport->send();
     }
 
     /**

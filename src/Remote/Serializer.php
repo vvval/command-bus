@@ -9,7 +9,7 @@ interface Serializer
     /**
      * @param object $command
      *
-     * @return Envelope
+     * @return string
      */
     public function serialize(object $command): string;
 

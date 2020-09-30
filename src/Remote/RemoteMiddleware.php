@@ -15,11 +15,18 @@ final class RemoteMiddleware implements Middleware
     private $gateway;
 
     /**
-     * @param Gateway $gateway
+     * @var array
      */
-    public function __construct(Gateway $gateway)
+    private $local;
+
+    /**
+     * @param Gateway       $gateway
+     * @param array<string> $local
+     */
+    public function __construct(Gateway $gateway, array $local = [])
     {
         $this->gateway = $gateway;
+        $this->local   = $local;
     }
 
     /**
@@ -27,10 +34,15 @@ final class RemoteMiddleware implements Middleware
      */
     public function call(object $message, Context $context, callable $next): void
     {
-        if ($context->get(Gateway::LOCAL, false)) {
+        if ($this->isLocal($message, $context)) {
             $next($message, $context);
         } else {
             $this->gateway->send($message, $context->all());
         }
+    }
+
+    private function isLocal(object $message, Context $context): bool
+    {
+        return in_array(get_class($message), $this->local) || $context->get(Gateway::LOCAL, false);
     }
 }

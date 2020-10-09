@@ -118,9 +118,9 @@ final class BunnyConsumer implements Consumer
                 self::OPTION_DELIVERY_TAG => $message->deliveryTag,
             ]);
 
-            $dispatcher->dispatch(new Envelope($message->routingKey, $message->content, $options), [
-                Gateway::LOCAL => true,
-            ]);
+            $type = $message->headers[BunnyTransport::HEADER_TYPE];
+
+            $dispatcher->dispatch(new Envelope($type, $message->content, $options));
         } finally {
             $channel->ack($message);
         }

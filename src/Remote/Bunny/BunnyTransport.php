@@ -15,6 +15,10 @@ use Psr\Log\NullLogger;
 
 final class BunnyTransport implements Transport
 {
+    public const
+        HEADER_TYPE = 'type'
+    ;
+
     /**
      * @var Client
      */
@@ -97,12 +101,17 @@ final class BunnyTransport implements Transport
      */
     public function send(Envelope $envelope): void
     {
+        // TODO: process envelope options?
+        $headers = $envelope->options + [
+            self::HEADER_TYPE => $envelope->type,
+        ];
+
         $exchange = $this->exchanges[$envelope->type] ?? $this->options->exchange();
         $routingKey = strtolower(str_replace('\\', '.', $envelope->type));
 
         $this->channel()->publish(
             $envelope->payload,
-            $envelope->options,
+            $headers,
             $exchange,
             $routingKey,
             $this->options->is(ExchangeOptions::FLAG_MANDATORY),

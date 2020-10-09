@@ -26,7 +26,7 @@ final class RemoteMiddleware implements Middleware
     public function __construct(Gateway $gateway, array $local = [])
     {
         $this->gateway = $gateway;
-        $this->local   = $local;
+        $this->local   = array_flip($local);
     }
 
     /**
@@ -37,12 +37,18 @@ final class RemoteMiddleware implements Middleware
         if ($this->isLocal($message, $context)) {
             $next($message, $context);
         } else {
-            $this->gateway->send($message, $context->all());
+            $this->gateway->send($message, $context);
         }
     }
 
+    /**
+     * @param object  $message
+     * @param Context $context
+     *
+     * @return bool
+     */
     private function isLocal(object $message, Context $context): bool
     {
-        return in_array(get_class($message), $this->local) || $context->get(Gateway::LOCAL, false);
+        return isset($this->local[get_class($message)]) || $context->get(Gateway::LOCAL, false);
     }
 }

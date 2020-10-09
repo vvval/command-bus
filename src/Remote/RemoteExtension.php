@@ -56,10 +56,7 @@ final class RemoteExtension implements Extension
     {
         $gateway = new Gateway($this->transport, $this->serializer);
 
-        $builder->middleware(new RemoteMiddleware($gateway, array_unique($this->local)));
-
-        $builder->handle(Envelope::class, function (Envelope $envelope, Context $context) use ($gateway) {
-            $gateway->receive($envelope, $context);
-        });
+        $builder->handle(Envelope::class, [$gateway, 'receive']);
+        $builder->middleware(new RemoteMiddleware($gateway, $this->local));
     }
 }

@@ -17,24 +17,37 @@ final class Context
     private $options;
 
     /**
-     * @param Dispatcher   $dispatcher
-     * @param array<mixed> $options
+     * @param Dispatcher            $dispatcher
+     * @param array<string, Option> $options
      */
-    public function __construct(Dispatcher $dispatcher, array $options = [])
+    public function __construct(Dispatcher $dispatcher, array $options)
     {
         $this->dispatcher = $dispatcher;
         $this->options    = $options;
     }
 
     /**
-     * @param object       $message
-     * @param array<mixed> $options
+     * @param Dispatcher $dispatcher
+     * @param array      $options
+     *
+     * @return self
+     */
+    public static function create(Dispatcher $dispatcher, array $options): self
+    {
+        return new self($dispatcher, array_combine(array_map(function (Option $option) {
+            return get_class($option);
+        }, $options), $options));
+    }
+
+    /**
+     * @param object    $message
+     * @param Option ...$options
      *
      * @return void
      */
-    public function dispatch(object $message, array $options = []): void
+    public function dispatch(object $message, Option ...$options): void
     {
-        $this->dispatcher->dispatch($message, $options);
+        $this->dispatcher->dispatch($message, ...$options);
     }
 
     /**
@@ -57,37 +70,11 @@ final class Context
 
     /**
      * @param string $option
-     * @param mixed  $default
      *
-     * @return mixed
+     * @return Option|null
      */
-    public function get(string $option, $default = null)
+    public function get(string $option): ?Option
     {
-        return $this->options[$option] ?? $default;
-    }
-
-    /**
-     * @param string $option
-     * @param mixed  $value
-     *
-     * @return self
-     */
-    public function set(string $option, $value): self
-    {
-        $this->options[$option] = $value;
-
-        return $this;
-    }
-
-    /**
-     * @param string $option
-     *
-     * @return self
-     */
-    public function del(string $option): self
-    {
-        unset($this->options[$option]);
-
-        return $this;
+        return $this->options[$option] ?? null;
     }
 }

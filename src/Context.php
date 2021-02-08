@@ -77,4 +77,16 @@ final class Context
     {
         return $this->options[$option] ?? null;
     }
+
+    /**
+     * @param Option $option
+     *
+     * @return self
+     */
+    public function with(Option $option): self
+    {
+        return new self($this->dispatcher, array_replace($this->options, [
+            get_class($option) => $option
+        ]));
+    }
 }

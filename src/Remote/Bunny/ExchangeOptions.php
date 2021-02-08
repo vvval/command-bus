@@ -22,7 +22,8 @@ final class ExchangeOptions
         HEADER_CONSUMER_TAG = 'consumer_tag',
         HEADER_DELIVERY_TAG = 'delivery_tag',
         HEADER_REDELIVERED  = 'redelivered',
-        HEADER_MESSAGE_TYPE = 'x-message-type'
+        HEADER_MESSAGE_TYPE = 'x-message-type',
+        HEADER_DELAY        = 'x-delay'
     ;
 
     public const

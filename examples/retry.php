@@ -19,10 +19,16 @@ $retry->policy(MaybeFail::class, new Policy\SimplePolicy(3));
 
 $dispatcher = (new Builder())
     ->handle(MaybeFail::class, function (MaybeFail $command, Context $context) {
-        $attempt = $context->get(Attempt::class) ?? new Attempt();
+        $attempt = $context->get(Attempt::class);
 
-        if ($attempt->value < 3) {
-            echo 'Fail ' , $attempt->value , ' times', \PHP_EOL;
+        if (!$attempt) {
+            echo 'Fail 1 times', \PHP_EOL;
+
+            throw new LogicException();
+        }
+
+        if (!$attempt->reach(3)) {
+            echo 'Fail ' , ($attempt->value() + 1) , ' times', \PHP_EOL;
 
             throw new LogicException();
         }

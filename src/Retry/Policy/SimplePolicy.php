@@ -36,9 +36,10 @@ final class SimplePolicy implements Policy
      */
     public function retry(object $message, Context $context, Throwable $error): void
     {
-        $attempt = $context->get(Option\Attempt::class) ?? new Option\Attempt(0);
+        /** @var Option\Attempt $attempt */
+        $attempt = $context->get(Option\Attempt::class) ?? new Option\Attempt($error);
 
-        if ($attempt->value > $this->retries) {
+        if ($attempt->reach($this->retries)) {
             throw $error;
         }
 
@@ -46,6 +47,7 @@ final class SimplePolicy implements Policy
             usleep($this->delay);
         }
 
-        $context->dispatch($message, new Option\Attempt(++$attempt->value));
+
+        $context->dispatch($message, $attempt->next($error));
     }
 }

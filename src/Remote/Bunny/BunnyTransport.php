@@ -8,12 +8,13 @@ use Bunny\Channel;
 use Bunny\Client;
 use InvalidArgumentException;
 use Onliner\CommandBus\Remote\Consumer;
+use Onliner\CommandBus\Remote\DelayedTransport;
 use Onliner\CommandBus\Remote\Envelope;
 use Onliner\CommandBus\Remote\Transport;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 
-final class BunnyTransport implements Transport
+final class BunnyTransport implements Transport, DelayedTransport
 {
     /**
      * @var Client
@@ -97,7 +98,17 @@ final class BunnyTransport implements Transport
     }
 
     /**
-     * @return Consumer
+     * {@inheritDoc}
+     */
+    public function delay(int $delay, Envelope $envelope): void
+    {
+        $envelope->headers[ExchangeOptions::HEADER_DELAY] = $delay;
+
+        $this->send($envelope);
+    }
+
+    /**
+     * {@inheritDoc}
      */
     public function consume(): Consumer
     {
